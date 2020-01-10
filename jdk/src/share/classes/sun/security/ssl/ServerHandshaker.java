@@ -764,6 +764,22 @@ final class ServerHandshaker extends Handshaker {
             }
         }
 
+        // maybe app wants to select a protocol
+        AppLayerProtoNegoExtension clientHelloALPNExt = (AppLayerProtoNegoExtension)
+                        mesg.extensions.get(ExtensionType.EXT_APP_LAYER_PROTO_NEGO);
+        List<String> alpnStrings = (clientHelloALPNExt == null) ? null : clientHelloALPNExt.getStrings ();
+        List<String> alpnStringReply = null;
+        if (engine != null) {
+            ALPNExtensionListener alpnel = engine.getALPNExtensionListener ();
+            if (alpnel != null) {
+                alpnStringReply = alpnel.alpnChoose (alpnStrings);
+            }
+        }
+        if (alpnStringReply != null) {
+            AppLayerProtoNegoExtension serverHelloALPNExt = new AppLayerProtoNegoExtension (alpnStringReply);
+            m1.extensions.add (serverHelloALPNExt);
+        }
+
         if (debug != null && Debug.isOn("handshake")) {
             m1.print(System.out);
             System.out.println("Cipher suite:  " + session.getSuite());
@@ -1393,8 +1409,10 @@ final class ServerHandshaker extends Handshaker {
         X509ExtendedKeyManager km = sslContext.getX509KeyManager();
         String alias;
         if (conn != null) {
+            conn.serverNames = session.getRequestedServerNames();
             alias = km.chooseServerAlias(algorithm, null, conn);
         } else {
+            engine.serverNames = session.getRequestedServerNames();
             alias = km.chooseEngineServerAlias(algorithm, null, engine);
         }
         if (alias == null) {

@@ -1190,6 +1190,20 @@ public abstract class SSLEngine {
     public abstract boolean getEnableSessionCreation();
 
     /**
+     * Sets a listener that is called on server during negotiation.
+     * @param alpnel: listener that gets called
+     *                or null to disable
+     */
+    public abstract void setALPNExtensionListener (ALPNExtensionListener alpnel);
+
+    /**
+     * Gets the listener that has been set by setALPNExtensionListener()
+     * @return null: no alpn extension listener established
+     *         else: the established alpn extension listener
+     */
+    public abstract ALPNExtensionListener getALPNExtensionListener ();
+
+    /**
      * Returns the SSLParameters in effect for this SSLEngine.
      * The ciphersuites and protocols of the returned SSLParameters
      * are always non-null.

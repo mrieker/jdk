@@ -96,6 +96,10 @@ final class ExtensionType {
     final static ExtensionType EXT_SIGNATURE_ALGORITHMS =
             e(0x000D, "signature_algorithms");   // IANA registry value: 13
 
+    // extensions defined in RFC 7301
+    final static ExtensionType EXT_APP_LAYER_PROTO_NEGO =
+            e(0x0010, "app_layer_proto_nego");   // IANA registry value: 16
+
     // extensions defined in RFC 5746
     final static ExtensionType EXT_RENEGOTIATION_INFO =
             e(0xff01, "renegotiation_info");     // IANA registry value: 65281

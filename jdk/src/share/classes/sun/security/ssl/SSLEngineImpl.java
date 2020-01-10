@@ -330,6 +330,17 @@ final public class SSLEngineImpl extends SSLEngine {
      */
     private static final Debug debug = Debug.getInstance("ssl");
 
+    /*
+     * Callback hook for ALPN during handshake.
+     */
+    private ALPNExtensionListener alpnel;
+
+    @Override
+    public void setALPNExtensionListener (ALPNExtensionListener alpnel) { this.alpnel = alpnel; }
+
+    @Override
+    public ALPNExtensionListener getALPNExtensionListener () { return alpnel; }
+
     //
     // Initialization/Constructors
     //
