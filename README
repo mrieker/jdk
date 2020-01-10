@@ -1,3 +1,43 @@
+server-side sni and alpn for http/2 with https
+
+for SNI (hostname sent by client during SSL handshake),
+key manager's chooseEngineServerAlias() can retrieve SNI
+hostname via the engine's SSL parameters:
+
+public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine)
+{
+    List<SNIServerName> servernames = engine.getSSLParameters ().getServerNames ();
+    if ((servernames != null) && (servernames.size () > 0)) {
+        SNIServerName snisn = servernames.get (0);
+        return new String (snisn.getEncoded ()).toLowerCase ();
+    }
+    return null;
+}
+
+
+for ALPN (select http/2 protocol during SSL handshake),
+set a listener of type ALPNExtensionListener to the engine
+to be called during handshaking:
+
+    engine.setALPNExtensionListener (new ALPNExtensionListener () {
+
+        // alpns usually contains "h2", "http/1.1"
+        // if you want http/2, return a list containing just "h2"
+        // otherwise, return null (for default of http/1.1)
+        //   or return list containing just "http/1.1"
+        @Override
+        public List<String> alpnChoose (List<String> alpns)
+        {
+            check alpns for "h2" and "http/1.1"
+
+            ArrayList<String> ret = new ArrayList<> (1);
+            ret.add ( either "h2" or "http/1.1" );
+            return ret;
+        }
+    });
+
+---- original README ----
+
 README:
   This file should be located at the top of the OpenJDK Mercurial root
   repository. A full OpenJDK repository set (forest) should also include
